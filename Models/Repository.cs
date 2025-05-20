@@ -61,21 +61,24 @@ namespace DineEase.Models
 		public async Task<T> GetByIdAsync(int id, QueryOptions<T> options)
 		{
 			var query = _entities.AsQueryable();
-			if (options.HasWhere)
-			{
-				query = query.Where(options.Where);
-			}
-			if (options.HasOrderBy)
-			{
-				query = query.OrderBy(options.OrderBy);
-			}
-			foreach (var include in options.GetIncludes())
-			{
-				query = query.Include(include);
-			}
 
-			var key = _context.Model.FindEntityType(typeof(T)).FindPrimaryKey().Properties.FirstOrDefault();
-			string? primaryKeyName = key?.Name;
+			if (options.HasWhere)
+				query = query.Where(options.Where);
+
+			if (options.HasOrderBy)
+				query = query.OrderBy(options.OrderBy);
+
+			foreach (var include in options.GetIncludes())
+				query = query.Include(include);
+
+			var entityType = _context.Model.FindEntityType(typeof(T));
+			var key = entityType?.FindPrimaryKey()?.Properties.FirstOrDefault();
+			if (key == null)
+			{
+				throw new InvalidOperationException($"Primary key not found for entity type {typeof(T).Name}");
+			}
+			string primaryKeyName = key.Name;
+
 			return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, primaryKeyName) == id);
 		}
 
