@@ -7,7 +7,7 @@
 <h3>Edit Ingredient</h3>
 <form asp-action="Edit" method="post">
     <input type="hidden" asp-for="IngredientId" />
-    <div class="form-group">
+    <div class="form-group mb-1">
         <label asp-for="Name"></label>
         <input asp-for="Name" class="form-control" />
         <span asp-validation-for="Name" class="text-danger"></span>
