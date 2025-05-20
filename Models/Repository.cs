@@ -42,7 +42,7 @@ namespace DineEase.Models
 
 		public async Task<IEnumerable<T>> GetAllByIdAsync<TKey>(TKey id, string propertyName, QueryOptions<T> options)
 		{
-			var query = _entities.AsQueryable();
+			IQueryable<T> query = _entities;
 			if (options.HasWhere)
 			{
 				query = query.Where(options.Where);
@@ -55,7 +55,11 @@ namespace DineEase.Models
 			{
 				query = query.Include(include);
 			}
-			return await Task.FromResult(query.AsEnumerable());
+
+			// Filter by the specified property name and id --> TODO: need to check this logic
+			query = query.Where(e => EF.Property<TKey>(e, propertyName).Equals(id));
+
+			return await query.ToListAsync();
 		}
 
 		public async Task<T> GetByIdAsync(int id, QueryOptions<T> options)
