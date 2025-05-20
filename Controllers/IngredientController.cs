@@ -21,7 +21,7 @@ namespace DineEase.Controllers
 
 		public async Task<IActionResult> Details(int id)
 		{
-			var ingredient = await ingredients.GetByIdAsync(id, null);
+			var ingredient = await ingredients.GetByIdAsync(id, new QueryOptions<Ingredient>() { Includes = "ProductIngredients.Product" });
 			if (ingredient == null)
 			{
 				return NotFound();
